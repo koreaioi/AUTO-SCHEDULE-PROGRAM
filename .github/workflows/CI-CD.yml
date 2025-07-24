@@ -66,5 +66,8 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
+            echo "디렉토리 이동"
+            cd ./auto-scheduling
+            
             echo "Deploy 쉘 스크립트 실행"
             sudo ./deploy.sh
