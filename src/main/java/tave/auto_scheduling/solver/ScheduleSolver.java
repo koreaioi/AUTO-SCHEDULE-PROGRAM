@@ -32,10 +32,19 @@ public class ScheduleSolver {
 
         // 최종 최적해를 동기적으로 기다림.
         try {
+
             InterviewSchedule solution = solverJob.getFinalBestSolution();
+            checkHardConstraint(solution);
+
             return solution;
         } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("문제를 해결하지 못했습니다.", e);
+        }
+    }
+
+    public void checkHardConstraint(InterviewSchedule solution) {
+        if (solution.getScore().hardScore() < 0) {
+            throw new IllegalStateException("하드 제약을 만족하는 해를 찾지 못했습니다.");
         }
     }
 
