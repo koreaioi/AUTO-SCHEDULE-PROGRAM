@@ -35,6 +35,7 @@ public class ScheduleSolver {
 
             InterviewSchedule solution = solverJob.getFinalBestSolution();
             checkHardConstraint(solution);
+            isChosenTimeSlotByApplicant(solution);
 
             return solution;
         } catch (InterruptedException | ExecutionException e) {
@@ -45,6 +46,16 @@ public class ScheduleSolver {
     public void checkHardConstraint(InterviewSchedule solution) {
         if (solution.getScore().hardScore() < 0) {
             throw new IllegalStateException("하드 제약을 만족하는 해를 찾지 못했습니다.");
+        }
+    }
+
+    public void isChosenTimeSlotByApplicant(InterviewSchedule solution) {
+        List<ApplicantAssignment> assignmentList = solution.getAssignmentList();
+
+        for(ApplicantAssignment assignment : assignmentList) {
+            if (assignment.validAssignedTimeSlot()) {
+                throw new IllegalStateException("지원자가 희망하는 시간에 배정되지 않았습니다");
+            }
         }
     }
 
