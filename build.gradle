@@ -29,6 +29,14 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// OptaPlanner
+	implementation("org.optaplanner:optaplanner-core:9.44.0.Final")
+	implementation 'org.optaplanner:optaplanner-spring-boot-starter:9.44.0.Final' // 최신 버전 사용
+
+	// POI for Excel
+	implementation("org.apache.poi:poi:5.4.0")
+	implementation("org.apache.poi:poi-ooxml:5.4.0")
 }
 
 tasks.named('test') {
