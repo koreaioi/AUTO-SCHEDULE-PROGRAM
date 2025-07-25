@@ -1,6 +1,7 @@
 package tave.auto_scheduling.domain;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -14,6 +15,7 @@ import java.util.UUID;
 * @PlanningVariable를 통해서 OptaPlanner가 자동으로 최적의 InterviewSlot을 넣어줌.
 * */
 
+@Slf4j
 @Getter
 @PlanningEntity
 public class ApplicantAssignment {
@@ -37,18 +39,20 @@ public class ApplicantAssignment {
 
     // TODO 추가 개선 필요. 검증이 아닌 경우 대비
     // Optaplanner가 배정한 시간이 지원자가 희망하는 면접시간대인지 검증함.
-    public void validAssignedTimeSlot() {
+    public boolean validAssignedTimeSlot() {
         if (assignedSlot == null) {
-            System.out.println("==== Assigned slot is null ====");
-            return;
+            return false;
         }
 
         LocalDateTime assignedTime = assignedSlot.getTime();
         boolean isValid = applicant.getAvailableSlots().contains(assignedTime);
 
         if (!isValid) {
-            System.out.println(" Applicant Name " + applicant.getName() + " has incorrect time slot");
+            log.info(" Applicant Name {} has incorrect time slot", applicant.getName());
+            return false;
         }
+
+        return true;
     }
 
 }

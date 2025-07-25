@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Configuration
-public class OptaPlannerConfig {
+public class OptaPlannerSolverConfig {
 
     @Bean
     public SolverConfig solverConfig() {
@@ -39,4 +39,5 @@ public class OptaPlannerConfig {
     public SolverManager<InterviewSchedule, UUID> solverManager(SolverFactory<InterviewSchedule> solverFactory) {
         return SolverManager.create(solverFactory);
     }
+
 }
