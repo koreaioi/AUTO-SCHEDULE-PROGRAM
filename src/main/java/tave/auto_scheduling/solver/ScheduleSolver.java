@@ -53,7 +53,7 @@ public class ScheduleSolver {
         List<ApplicantAssignment> assignmentList = solution.getAssignmentList();
 
         for(ApplicantAssignment assignment : assignmentList) {
-            if (assignment.validAssignedTimeSlot()) {
+            if (!assignment.validAssignedTimeSlot()) {
                 throw new IllegalStateException("지원자가 희망하는 시간에 배정되지 않았습니다");
             }
         }
