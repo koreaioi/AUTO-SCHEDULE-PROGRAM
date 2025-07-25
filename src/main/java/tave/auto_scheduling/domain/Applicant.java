@@ -21,7 +21,7 @@ public class Applicant {
     private String univ;
     private List<LocalDateTime> availableSlots;
 
-    public Applicant of(String name, String sex, String email, String part, String univ, List<LocalDateTime> availableSlots) {
+    public static Applicant of(String name, String sex, String email, String part, String univ, List<LocalDateTime> availableSlots) {
         return Applicant.builder()
                 .name(name)
                 .sex(sex)
