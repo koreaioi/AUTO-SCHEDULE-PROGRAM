@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class InterviewSlot {
     private LocalDateTime time;
 
-    public InterviewSlot of(LocalDateTime time) {
+    public static InterviewSlot of(LocalDateTime time) {
         return InterviewSlot.builder()
                 .time(time)
                 .build();
