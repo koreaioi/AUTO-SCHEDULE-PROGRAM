@@ -39,4 +39,5 @@ public class OptaPlannerConfig {
     public SolverManager<InterviewSchedule, UUID> solverManager(SolverFactory<InterviewSchedule> solverFactory) {
         return SolverManager.create(solverFactory);
     }
+
 }
