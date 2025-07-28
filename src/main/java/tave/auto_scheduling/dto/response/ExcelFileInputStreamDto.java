@@ -5,12 +5,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import java.io.ByteArrayInputStream;
 
-@Builder // Lombok 어노테이션
+@Builder
 public record ExcelFileInputStreamDto(
         InputStreamResource inputStreamResource,
         HttpHeaders headers,
         long contentLength
 ) {
+
     public static ExcelFileInputStreamDto from(ByteArrayInputStream byteArrayInputStream, HttpHeaders headers, long contentLength) {
         return ExcelFileInputStreamDto.builder()
                 .inputStreamResource(new InputStreamResource(byteArrayInputStream))
@@ -18,4 +19,5 @@ public record ExcelFileInputStreamDto(
                 .contentLength(contentLength)
                 .build();
     }
+
 }
