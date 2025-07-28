@@ -15,4 +15,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(false) // 쿠키 허용 여부 (필요시)
                 .maxAge(3600); // pre-flight 요청 캐시 시간
     }
+
 }
