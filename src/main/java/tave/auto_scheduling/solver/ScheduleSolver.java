@@ -1,6 +1,7 @@
 package tave.auto_scheduling.solver;
 
 import lombok.extern.slf4j.Slf4j;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.SolverJob;
 import org.optaplanner.core.api.solver.SolverManager;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,16 @@ public class ScheduleSolver {
         InterviewSchedule problem = new InterviewSchedule(timeSlots, assignmentList);
 
         UUID problemId = UUID.randomUUID();
-        SolverJob<InterviewSchedule, UUID> solverJob = solverManager.solve(problemId, problem);
 
-        // 최종 최적해를 동기적으로 기다림.
+        SolverJob<InterviewSchedule, UUID> solverJob = solverManager.solveAndListen(
+                problemId,
+                id -> problem,
+                bestSolution -> {
+                    HardSoftScore score = bestSolution.getScore();
+                    log.info("🧠 새로운 최적 해 발견: hard = {}, soft = {}",
+                            score.hardScore(), score.softScore());
+                });
+
         try {
 
             InterviewSchedule solution = solverJob.getFinalBestSolution();
