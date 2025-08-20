@@ -6,6 +6,7 @@ import tave.auto_scheduling.domain.ApplicantAssignment;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Builder
 public record ApplicantDto(
@@ -22,8 +23,12 @@ public record ApplicantDto(
         Applicant applicant = applicantAssignment.getApplicant();
         LocalDateTime dateTime = applicantAssignment.getAssignedSlot().getTime();
 
-        String interviewDate = dateTime.format(DateTimeFormatter.ofPattern("M월 d일"));
-        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+//        String interviewDate = dateTime.format(DateTimeFormatter.ofPattern("M월 d일"));
+//        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+        String interviewDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("h:mm:ss a", Locale.ENGLISH));
+
 
         return ApplicantDto.builder()
                 .name(applicant.getName())
