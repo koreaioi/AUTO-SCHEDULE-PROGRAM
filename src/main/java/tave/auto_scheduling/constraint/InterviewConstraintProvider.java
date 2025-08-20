@@ -18,7 +18,8 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                 limitDistinctParts(factory),
                 preferSamePartInSlot(factory),
                 preferFullInterviewSlots(factory),
-                bonusForSinglePartSlot(factory)
+                bonusForSinglePartSlot(factory),
+                preferDeepLearningOnSunMon(factory)
         };
     }
 
