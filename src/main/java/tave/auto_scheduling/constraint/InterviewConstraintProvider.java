@@ -4,6 +4,7 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.stream.*;
 import tave.auto_scheduling.domain.ApplicantAssignment;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +18,8 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                 limitDistinctParts(factory),
                 preferSamePartInSlot(factory),
                 preferFullInterviewSlots(factory),
-                bonusForSinglePartSlot(factory)
+                bonusForSinglePartSlot(factory),
+                preferDeepLearningOnSunMon(factory)
         };
     }
 
@@ -78,6 +80,24 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                 .filter((slot, partSet) -> partSet.size() == 1)
                 .reward(HardSoftScore.ONE_SOFT)
                 .asConstraint("한 시간대에 동일 파트만 있으면 추가 보상");
+    }
+
+    // [Soft] 제약 4 - 딥러닝 파트는 일요일 또는 월요일 선호
+    private Constraint preferDeepLearningOnSunMon(ConstraintFactory factory) {
+        return factory.forEach(ApplicantAssignment.class)
+                // 필터링 조건
+                .filter(assignment -> {
+                    boolean isDeepLearning = assignment.getApplicant().getPart().equals("딥러닝");
+
+                    LocalDateTime assignedTime = assignment.getAssignedSlot().getTime();
+                    DayOfWeek dayOfWeek = assignedTime.getDayOfWeek();
+                    boolean isSundayOrMonday = dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.MONDAY;
+
+                    return isDeepLearning && isSundayOrMonday;
+                })
+                // 조건을 만족하면 Soft 점수 1점 보상
+                .reward(HardSoftScore.ONE_SOFT)
+                .asConstraint("딥러닝 파트는 일/월요일 선호");
     }
 
 }
