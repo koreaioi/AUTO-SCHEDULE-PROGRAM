@@ -45,6 +45,8 @@ public class ExcelExportService {
                 String part = getStringCellValue(row.getCell(3));
                 String univ = getStringCellValue(row.getCell(4));
 
+                log.info("part {}", part);
+
                 List<LocalDateTime> availableTimes = new ArrayList<>();
                 for (int i = 5; i < row.getLastCellNum(); i++) {
                     Cell cell = row.getCell(i);
