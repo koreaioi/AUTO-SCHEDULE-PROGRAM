@@ -30,6 +30,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.optaplanner:optaplanner-test:9.44.0.Final'
 
 	// OptaPlanner
 	implementation("org.optaplanner:optaplanner-core:9.44.0.Final")

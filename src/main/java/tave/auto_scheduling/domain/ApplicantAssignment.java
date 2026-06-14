@@ -37,6 +37,10 @@ public class ApplicantAssignment {
         this.applicant = applicant;
     }
 
+    public void setAssignedSlot(InterviewSlot assignedSlot) {
+        this.assignedSlot = assignedSlot;
+    }
+
     // TODO 추가 개선 필요. 검증이 아닌 경우 대비
     // Optaplanner가 배정한 시간이 지원자가 희망하는 면접시간대인지 검증함.
     public boolean validAssignedTimeSlot() {

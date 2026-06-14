@@ -8,6 +8,7 @@ import tave.auto_scheduling.domain.Interviewer;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class InterviewConstraintProvider implements ConstraintProvider {
 
@@ -26,7 +27,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Hard] 지원자가 선택한 시간에만 배정
-    private Constraint mustBeAvailableSlot(ConstraintFactory factory) {
+    Constraint mustBeAvailableSlot(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .join(ConstraintConfig.class,
                         Joiners.equal(a -> "MUST_BE_AVAILABLE_SLOT", ConstraintConfig::getConstraintName))
@@ -37,7 +38,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Hard] 슬롯당 최대 인원 (threshold 동적)
-    private Constraint maxPerSlot(ConstraintFactory factory) {
+    Constraint maxPerSlot(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .groupBy(ApplicantAssignment::getAssignedSlot, ConstraintCollectors.count())
                 .join(ConstraintConfig.class,
@@ -50,7 +51,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Hard] 슬롯당 파트 종류 최대 수 (threshold 동적)
-    private Constraint limitDistinctParts(ConstraintFactory factory) {
+    Constraint limitDistinctParts(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .groupBy(ApplicantAssignment::getAssignedSlot,
                         ConstraintCollectors.toSet(a -> a.getApplicant().getPart()))
@@ -64,7 +65,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Soft] 면접관 가용 시간 외 배정 감점 (면접관 미등록 시 자동 비활성화)
-    private Constraint interviewerMustBeAvailable(ConstraintFactory factory) {
+    Constraint interviewerMustBeAvailable(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .join(ConstraintConfig.class,
                         Joiners.equal(a -> "INTERVIEWER_MUST_BE_AVAILABLE", ConstraintConfig::getConstraintName))
@@ -78,7 +79,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Soft] 같은 파트일수록 보상 (weight 동적)
-    private Constraint preferSamePartInSlot(ConstraintFactory factory) {
+    Constraint preferSamePartInSlot(ConstraintFactory factory) {
         return factory.forEachUniquePair(ApplicantAssignment.class,
                         Joiners.equal(ApplicantAssignment::getAssignedSlot))
                 .filter((a1, a2) -> !a1.getApplicant().getPart().equals(a2.getApplicant().getPart()))
@@ -90,7 +91,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Soft] 슬롯 인원이 많을수록 보상 (weight 동적)
-    private Constraint preferFullInterviewSlots(ConstraintFactory factory) {
+    Constraint preferFullInterviewSlots(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .groupBy(ApplicantAssignment::getAssignedSlot, ConstraintCollectors.count())
                 .join(ConstraintConfig.class,
@@ -101,7 +102,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Soft] 동일 파트만 있는 슬롯 추가 보상 (weight 동적)
-    private Constraint bonusForSinglePartSlot(ConstraintFactory factory) {
+    Constraint bonusForSinglePartSlot(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .groupBy(ApplicantAssignment::getAssignedSlot,
                         ConstraintCollectors.toSet(a -> a.getApplicant().getPart()))
@@ -114,7 +115,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
     }
 
     // [Soft] 파트별 선호 요일 보상 — DB의 PREFER_PART_ON_DAYS_* 설정 전체 동적 처리
-    private Constraint preferPartOnDays(ConstraintFactory factory) {
+    Constraint preferPartOnDays(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .join(ConstraintConfig.class,
                         Joiners.filtering((a, cfg) ->
@@ -127,7 +128,9 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                     DayOfWeek day = a.getAssignedSlot().getTime().getDayOfWeek();
                     return Arrays.stream(cfg.getPreferredDays().split(","))
                             .map(String::trim)
-                            .map(DayOfWeek::valueOf)
+                            .filter(s -> !s.isEmpty())
+                            .map(s -> { try { return DayOfWeek.valueOf(s); } catch (IllegalArgumentException e) { return null; } })
+                            .filter(Objects::nonNull)
                             .anyMatch(d -> d == day);
                 })
                 .reward(HardSoftScore.ONE_SOFT, (a, cfg) -> cfg.getWeight())
