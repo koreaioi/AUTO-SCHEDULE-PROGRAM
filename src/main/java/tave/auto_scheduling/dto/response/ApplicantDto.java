@@ -27,7 +27,7 @@ public record ApplicantDto(
 //        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
 
         String interviewDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        String interviewTime = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
 
         return ApplicantDto.builder()

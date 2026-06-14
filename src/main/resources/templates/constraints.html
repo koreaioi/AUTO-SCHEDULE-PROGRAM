@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('제약 설정')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav('constraints')}"></nav>
+
+<div class="container">
+  <h2>제약 설정</h2>
+  <p class="text-muted mb-4">각 제약 조건을 수정한 후 "저장" 버튼을 클릭하세요. 다음 스케줄링 실행 시 반영됩니다.</p>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>제약 이름</th>
+            <th>타입</th>
+            <th class="text-center">활성화</th>
+            <th>가중치</th>
+            <th>임계값</th>
+            <th>선호 요일</th>
+            <th class="text-end">작업</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="cfg : ${constraints}">
+            <form method="post" th:action="@{/constraints/{name}(name=${cfg.constraintName})}">
+            <td>
+              <div class="fw-bold" th:switch="${cfg.constraintName}">
+                <span th:case="'MUST_BE_AVAILABLE_SLOT'">지원자 시간 엄수</span>
+                <span th:case="'MAX_PER_SLOT'">슬롯당 최대 인원</span>
+                <span th:case="'LIMIT_DISTINCT_PARTS'">슬롯당 파트 수 제한</span>
+                <span th:case="'INTERVIEWER_MUST_BE_AVAILABLE'">면접관 시간 우선</span>
+                <span th:case="'PREFER_SAME_PART'">동일 파트 집중</span>
+                <span th:case="'PREFER_FULL_SLOTS'">슬롯 밀집화</span>
+                <span th:case="'BONUS_SINGLE_PART'">단일 파트 보너스</span>
+                <span th:case="${cfg.constraintName.startsWith('PREFER_PART_ON_DAYS') ? cfg.constraintName : 'N/A'}" th:text="${cfg.targetPart + ' 선호 요일'}"></span>
+                <span th:case="*" th:text="${cfg.constraintName}"></span>
+              </div>
+              <div class="text-muted small" th:text="${cfg.constraintName}"></div>
+              <div th:if="${cfg.targetPart != null and !cfg.constraintName.startsWith('PREFER_PART_ON_DAYS')}" th:text="${cfg.targetPart}" class="text-muted small"></div>
+            </td>
+              <td>
+                <span th:text="${cfg.constraintType}" class="badge"
+                      th:classappend="${cfg.constraintType == 'HARD'} ? ' bg-danger' : ' bg-warning'">
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="form-check d-inline-block">
+                  <input type="checkbox" name="enabled" value="true"
+                         th:checked="${cfg.enabled}" class="form-check-input">
+                </div>
+              </td>
+              <td>
+                <input type="number" name="weight" th:value="${cfg.weight}"
+                       class="form-control form-control-sm" style="width:80px" min="1">
+              </td>
+              <td>
+                <input type="number" name="threshold" th:value="${cfg.threshold}"
+                       class="form-control form-control-sm" style="width:80px"
+                       placeholder="-">
+              </td>
+              <td>
+                <div th:if="${cfg.constraintName.startsWith('PREFER_PART_ON_DAYS')}"
+                     class="d-flex flex-wrap gap-1" style="min-width:175px;">
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="MONDAY"
+                         th:id="${cfg.constraintName + '_MON'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('MONDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_MON'}">월</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="TUESDAY"
+                         th:id="${cfg.constraintName + '_TUE'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('TUESDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_TUE'}">화</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="WEDNESDAY"
+                         th:id="${cfg.constraintName + '_WED'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('WEDNESDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_WED'}">수</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="THURSDAY"
+                         th:id="${cfg.constraintName + '_THU'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('THURSDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_THU'}">목</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="FRIDAY"
+                         th:id="${cfg.constraintName + '_FRI'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('FRIDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_FRI'}">금</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="SATURDAY"
+                         th:id="${cfg.constraintName + '_SAT'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('SATURDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_SAT'}">토</label>
+
+                  <input type="checkbox" class="btn-check" autocomplete="off"
+                         name="preferredDays" value="SUNDAY"
+                         th:id="${cfg.constraintName + '_SUN'}"
+                         th:checked="${cfg.preferredDays != null and cfg.preferredDays.contains('SUNDAY')}">
+                  <label class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:0.72rem;"
+                         th:for="${cfg.constraintName + '_SUN'}">일</label>
+                </div>
+              </td>
+              <td class="text-end">
+                <button type="submit" class="btn btn-sm btn-primary">저장</button>
+              </td>
+            </form>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-2">
+    <div class="col-md-6">
+      <div class="card h-100 border-0 bg-white" style="box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="badge bg-danger me-2" style="width: 10px; height: 10px; padding: 0; border-radius: 50%;"> </span>
+            <h6 class="fw-bold mb-0" style="color: var(--toss-gray-900);">Hard 제약 (필수 조건)</h6>
+          </div>
+          <p class="text-muted small mb-4">스케줄링의 기본 원칙으로, 위반 시 배정 자체가 불가능하거나 실패로 간주됩니다.</p>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-3 d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">✔</span>
+              <div>
+                <div class="fw-bold small">지원자 시간 엄수 (MUST_BE_AVAILABLE_SLOT)</div>
+                <div class="text-muted" style="font-size: 0.8rem;">지원자가 제출한 엑셀 상의 면접 가능 시간대에만 배정합니다.</div>
+              </div>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">✔</span>
+              <div>
+                <div class="fw-bold small">슬롯당 최대 인원 (MAX_PER_SLOT)</div>
+                <div class="text-muted" style="font-size: 0.8rem;">한 시간대(슬롯)에 배정되는 지원자 수가 임계값을 넘지 않도록 합니다.</div>
+              </div>
+            </li>
+            <li class="d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">✔</span>
+              <div>
+                <div class="fw-bold small">슬롯당 파트 수 제한 (LIMIT_DISTINCT_PARTS)</div>
+                <div class="text-muted" style="font-size: 0.8rem;">한 슬롯에 너무 많은 파트가 섞여 면접 효율이 떨어지는 것을 방지합니다.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100 border-0 bg-white" style="box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="badge bg-warning me-2" style="width: 10px; height: 10px; padding: 0; border-radius: 50%;"> </span>
+            <h6 class="fw-bold mb-0" style="color: var(--toss-gray-900);">Soft 제약 (선호 조건)</h6>
+          </div>
+          <p class="text-muted small mb-4">최대한 만족시키려 노력하는 조건입니다. 가중치(Weight)가 높을수록 우선순위가 높습니다.</p>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-3 d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">⭐</span>
+              <div>
+                <div class="fw-bold small">면접관 시간 우선 및 파트 집중</div>
+                <div class="text-muted" style="font-size: 0.8rem;">면접관 가용 시간 우선 배정 및 동일 파트 지원자들을 최대한 모아서 배정합니다.</div>
+              </div>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">⭐</span>
+              <div>
+                <div class="fw-bold small">슬롯 밀집화 (PREFER_FULL_SLOTS)</div>
+                <div class="text-muted" style="font-size: 0.8rem;">인원이 분산되지 않도록 한 슬롯을 최대한 채우는 방향으로 최적화합니다.</div>
+              </div>
+            </li>
+            <li class="d-flex align-items-start">
+              <span class="me-2 mt-1" style="color: var(--toss-blue);">⭐</span>
+              <div>
+                <div class="fw-bold small">파트별 선호 요일 보너스</div>
+                <div class="text-muted" style="font-size: 0.8rem;">설정된 파트별 선호 요일에 배정될 경우 추가 가산점을 부여합니다.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

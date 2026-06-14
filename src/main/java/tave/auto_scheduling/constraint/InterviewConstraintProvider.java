@@ -63,7 +63,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                 .asConstraint("한 시간대에 허용된 파트 수를 초과");
     }
 
-    // [Hard] 면접관 가용 시간 외 배정 불가 (면접관 미등록 시 자동 비활성화)
+    // [Soft] 면접관 가용 시간 외 배정 감점 (면접관 미등록 시 자동 비활성화)
     private Constraint interviewerMustBeAvailable(ConstraintFactory factory) {
         return factory.forEach(ApplicantAssignment.class)
                 .join(ConstraintConfig.class,
@@ -73,7 +73,7 @@ public class InterviewConstraintProvider implements ConstraintProvider {
                 .ifNotExists(Interviewer.class,
                         Joiners.filtering((a, cfg, i) ->
                                 i.getAvailableTimes().contains(a.getAssignedSlot().getTime())))
-                .penalize(HardSoftScore.ONE_HARD)
+                .penalize(HardSoftScore.ONE_SOFT, (a, cfg) -> cfg.getWeight())
                 .asConstraint("면접관 가용 시간 외 배정 불가");
     }
 

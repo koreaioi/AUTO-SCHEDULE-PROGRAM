@@ -2,6 +2,7 @@ package tave.auto_scheduling.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.SolverManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +47,8 @@ public class ScheduleService {
                 .map(ApplicantDto::from)
                 .toList();
 
-        return ApplicantAssignmentDto.from(applicantDtoList);
+        HardSoftScore score = solution.getScore();
+        return ApplicantAssignmentDto.from(applicantDtoList, score.hardScore(), score.softScore());
     }
 
     private List<InterviewSlot> getUniqueTimeSlotList(List<Applicant> applicants) {
