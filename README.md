@@ -1,85 +1,124 @@
 # AUTO-SCHEDULE-PROGRAM
 
 - 면접시간 자동 매칭(스케줄링) Tave 자동화 도구
+- 수작업 6시간 → 자동화 1분 (99% 단축)
 - Use `Optaplanner` based on CSP Algorithm
 
-## 제공 가치
+## 사용 절차
+### 0. Docker 설치
+SpringBootApplication을 Docker 기반으로 구동합니다.
+따라서 Docker 설치가 필수입니다.
 
-- `Convenience` : 면접 배정 방식을 `수동` -> `자동`, `편리함` 제공 
-- `Concentration` : `귀찮지만 해야할 일`을 빠르게 해결하고 Tave 성장에 `집중`할 수 있도록 함.
-- `Courage` : Tave는 만들 수 있다. `용기` 독려
+### 1. Docker 실행 명령어
 
-<hr>
+Docker 설치 후, 다음 명령어 사용
 
-## 서비스 목적
+```bash
+docker run -dit -p 8080:8080 koreaioi/interview-scheduling:latest
+```
 
-### :trollface: Pain Point
+### 2. 사이트 접속
 
-지원자가 선택한 `면접 가능 시간` 중에서 운영진이 면접을 수동으로 배정하는 방식.   
-이는 다음과 같은 불편함과 비효율을 야기함.
+크롬, 사파리 같은 브라우저 URL에 다음을 입력하여, 사이트를 접속합니다.
 
-- :one: `많은 시간 소모` : 예를 들어, 120명의 지원자 면접시간을 배정한다고 할 때, 한명 당 1분으로 잡아도 2시간이 걸린다. 물론 여러 선호도 조건을 생각하면 2시간은 훌쩍 넘는다.
-- :two: `높은 오류 발생 가능성` : 많은 경우의 수, 제약 사항, 선호 조건을 동시에 만족하는 경우를 사람의 능력으로 배정하려는 경우, 수많은 오류 가능성이 존재. 이를 방지하기 위한 교차 검증 또한 결국 인력 소모
-- :three: `낮은 최적해 도달 가능성` : 수동 배정으로는 그저 '실행 가능한' 면접 스케줄을 만들 뿐, 가장 좋은 최적의 면접 스케줄을 만드는 건 매우 어렵다.
+```bash
+localhost:8080
+```
 
-### :smile: Solution
+### 3. 사이트 설명
 
-기존의 문제점을 해결하기 위해 다음과 같은 솔루션을 제공!
+<img width="1976" height="988" alt="image" src="https://github.com/user-attachments/assets/59fb163e-22a0-43f7-8601-a37beaacb0d6" />
 
-- :one: `Optaplanner` : Constraint Satisfaction Problems에 적합한 Java 기반 제약 조건 최적화 스케줄링 도구.
-- :two: `다양한 결과` : `어떤 조건`에 `가중치`를 줄 것인지에 대한 정의된 API를 제공하여, `여러 결과`를 제공.
-- :three: `시간 효율` : 기본 종료 조건은 10초간 더 나은 결과를 찾고, 최대 60초간 최적해를 찾음. 따라서 면접 배정 프로세스 과정 `10~60초` 예상
+#### 3-1. 면접 희망시간 파일 업로드
 
-<hr>
+파일 선택 버튼으로 `면접희망시간 파일`을 업로드합니다.   
+프로그램 체험을 희망한다면 아래의 더미 데이터 파일을 사용하세요.      
+[면접 스케줄링 체험용 더미 데이터.xlsx](https://github.com/user-attachments/files/29803742/default.xlsx)
 
-## :smiley_cat: 기술 스택
+#### 3-2. 스케줄링 방식 선택
 
-Spring Boot, OptaPlanner, Apache Poi
+기본, 최적화, 고품질 총 세가지 스케줄링 방식이 존재합니다.
+
+- 기본: 제약조건을 신경쓰지 않고 가능한 경우의 수만 빠르게 찾아냅니다.
+- 최적화: 제약조건을 신경써서 60초 정도의 최적해를 찾아냅니다.
+- 고품질: 제약조건을 가장 만족하는 최고의 경우의 수를 탐색합니다. (60초보다 더 걸릴 수 있습니다.)
+
+### 4. 스케줄링 시작
+
+`스케줄링 실행하기`버튼을 클릭하면, 면접 자동 배정 스케줄링을 시작합니다.
+면접자들의 희망 시간이 어떤 경우의 수에도 배치되지 않는 경우 `HARD 조건 에러`가 발생합니다.
+
+스케줄링 결과는 다운로드하여, 파일 그대로 관리자 페이지에 업로드하시면됩니다.
 
 
-<hr>
+### 5. (기타) 제약조건 설정
 
-## :construction: 구조 도식화
+사이트 우측 상단, `제약 설정`을 누르면 여러 HARD, SOFT 제약을 설정할 수 있습니다.   
 
-### 구조
+<img width="1926" height="1148" alt="image" src="https://github.com/user-attachments/assets/8076aa04-b1b1-412b-ab07-a807103f2911" />
 
-<img width="700" height="805" alt="Enhanced OptaPlanner Flow" src="https://github.com/user-attachments/assets/f7420567-436c-4be5-9fe7-060d8f128098" />
+이때, 다음과 같이 파트별 선호 요일과 가중치를 조절할 수 있습니다.   
+면접관의 시간을 맞추기 위해 요일별로 선호도(SOFT 제약조건)를 조정하고 싶다면 다음을 수정하시길 바랍니다.
 
-### Optaplanner 관리대상
+- 제약조건 설정을 반영하기 위해서는 `최적화` or `고품질`을 선택하고 스케줄링 돌려야합니다.
 
-#### InterviewSlot
-- 면접이 가능한 하나의 `날짜+시간` 단위를 나타냄.
-- 추후 InterviewSchedule의 필드로서 @ValueRangeProvider를 사용하여, 각 지원자가 전체 InterviewSlot중 하나를 배정받음.
+---
 
-#### Applicant
-- 실제 엑셀에서 가져오는 `지원자 기본 정보`
+# v1
+## 1-1. 기존 문제점
 
-#### ApplicantAssignment 
-- OptaPlanner의 핵심 최적화 대상
-- 하나의 지원자를 어떤 시간에 배치할지 결정하는 단위
-- OptaPlanner가 최적의 InterviewSlot을 계산하여 할당함
+- 서류 합격자 면접 희망 시간대를 조합하여, 수작업으로 면접시간 배정 (6시간 이상 소요)
+- 담당자가 엑셀을 열어 지원자별 희망 시간을 일일이 대조·조정
+- 조건이 하나라도 어긋나면 처음부터 재배정하는 구조
+- 슬롯당 최대 3명, 파트 분산, 면접관 선호 요일 등의 제약 조건을 고려
+- 수작업으로 희망하지 않은 면접 시간에 배정되는 문제 발생.
 
-#### InterviewSchedule 
-- 전체 스케줄링 결과를 담는 클래스
 
-### Optaplanner 구성
-#### InterviewConstraintProvider
-- Hard, Soft 제약 조건을 제공
+## 1-2. 개선 방법
 
-#### OptaPlannerSoverConfig, TerminationPolicyConfig
-- SoverManager 주입 역할
-- TerminationType에 따른 적절한 종료 조건 주입
+- Apache POI 기반으로 지원자 엑셀 데이터 파싱 및 희망시간 리포트 생성 (전처리 단계 자동화)
+- 제약 충족 문제(CSP)에 특화된 Optaplanner를 도입해 배정 로직 자체를 자동화함.
+  - Hard 제약: 지원자 희망 시간 준수 / 슬롯당 최대 3명 / 슬롯당 파트 종류 3개 이하
+  - Soft 제약: 면접관 선호 날짜, 동일 파트 선호, 슬롯 인원 최대화(가중치 제곱 보상), 단일 파트 슬롯 보너스
+- TerminateType에 따라 종료 조건(ONLY_HARD / OPTIMIZATION / HIGH_QUALITY)을 분리 설계하여 상황에 맞는 풀이 전략 선택 가능
+- 최종 결과에 지원자 희망시간 검증 로직을 적용하여, 배정 오류가 발생하지 않도록 안전장치 마련.
 
-#### SolverManager
-- solve(), solveAndListen()을 사용하여, 문제를 실제로 푸는 역할
 
-<hr>
+## 1-3. 성과
+- 면접 배정 처리 시간 `6시간 이상` → `1분` (약 99% 단축)
+- 면접 배정 오류율 0% (Hard 제약 위반 없음, 지원자 희망 시간 외 배정 사례 없음)
+- 배정 프로세스 자동화로 담당자의 의사결정 및 후속 커뮤니케이션 속도 향상
 
-### 시연 영상
+---
 
-100명의 면접가능시간을 무작위로 담은 테스트 Excel을 
-3가지 옵션 중 가장 빠른 결과를 내는 ONLY_HARD를 적용.
+# v2
+## 1-1. v1 문제점
 
-(GIF가 10MB 이하여야 하기에..... 가장 빨리 끝나는 ONLY_HARD 선택)
+- 제약 조건 하드코딩 →  기수마다 Production Code 수정
+- UI는 React로 개발하여, 사이트 배포를 위해 React + Spring 동시 구동
+- 해당 기능 사용 빈도 대비, 과한 배포 구조 (동아리 모집은 1년에 2번)
 
-![자동배치영상압축](https://github.com/user-attachments/assets/4e85c360-1c9b-4880-aec0-fa897c547c1b)
+
+## 1-2. v1 개선 방안
+
+- 하드코딩된 제약 파라미터를 엔티티 분리 & DB 저장, 스케줄링 직전 DB에서 조회하여 사용
+- React 코드 제거 후 Thymeleaf 기반 SSR로 전환.
+- Docker 이미지 배포로 전환. SSR 통합 이후 애플리케이션을 Docker 이미지로 패키징. 연 2회라는 낮은 사용 빈도에 맞춰, 상시 서버 구동 없이 필요 시점에 이미지 pull/run만으로 즉시 배포·환경 재현이 가능한 구조로 전환
+
+
+## 1-3. 성과
+
+- 배포 대상 애플리케이션 수: 2개(React + Spring) → 1개(Spring 단일)
+- 제약 조건 변경 시 필요한 배포 횟수: 매 기수 1회 이상 → 0회 (웹 UI에서 즉시 반영)
+- 관리 가능한 제약 조건: 0개(하드코딩) → 13개(DB 관리)
+
+---
+
+# 참고 자료
+
+- [optaplanner docs](https://docs.optaplanner.org/latest/optaplanner-docs/html_single/index.html)
+- [apache poi docs](https://poi.apache.org/apidocs/index.html)
+
+# 트러블 슈팅
+
+- [empty row를 마지막 행으로 인식하는 문제](https://github.com/koreaioi/AUTO-SCHEDULE-PROGRAM/pull/19)
