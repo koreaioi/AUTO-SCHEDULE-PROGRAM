@@ -1,9 +1,8 @@
 # AUTO-SCHEDULE-PROGRAM
 
 - 면접시간 자동 매칭(스케줄링) Tave 자동화 도구
+- 수작업 6시간 → 자동화 1분 (99% 단축)
 - Use `Optaplanner` based on CSP Algorithm
-
-
 
 ## 사용 절차
 ### 0. Docker 설치
@@ -44,7 +43,7 @@ localhost:8080
 - 최적화: 제약조건을 신경써서 60초 정도의 최적해를 찾아냅니다.
 - 고품질: 제약조건을 가장 만족하는 최고의 경우의 수를 탐색합니다. (60초보다 더 걸릴 수 있습니다.)
 
-## 4. 스케줄링 시작
+### 4. 스케줄링 시작
 
 `스케줄링 실행하기`버튼을 클릭하면, 면접 자동 배정 스케줄링을 시작합니다.
 면접자들의 희망 시간이 어떤 경우의 수에도 배치되지 않는 경우 `HARD 조건 에러`가 발생합니다.
@@ -52,7 +51,7 @@ localhost:8080
 스케줄링 결과는 다운로드하여, 파일 그대로 관리자 페이지에 업로드하시면됩니다.
 
 
-## 5. (기타) 제약조건 설정
+### 5. (기타) 제약조건 설정
 
 사이트 우측 상단, `제약 설정`을 누르면 여러 HARD, SOFT 제약을 설정할 수 있습니다.   
 
@@ -112,3 +111,14 @@ localhost:8080
 - 배포 대상 애플리케이션 수: 2개(React + Spring) → 1개(Spring 단일)
 - 제약 조건 변경 시 필요한 배포 횟수: 매 기수 1회 이상 → 0회 (웹 UI에서 즉시 반영)
 - 관리 가능한 제약 조건: 0개(하드코딩) → 13개(DB 관리)
+
+---
+
+# 참고 자료
+
+- [optaplanner docs](https://docs.optaplanner.org/latest/optaplanner-docs/html_single/index.html)
+- [apache poi docs](https://poi.apache.org/apidocs/index.html)
+
+# 트러블 슈팅
+
+- [empty row를 마지막 행으로 인식하는 문제](https://github.com/koreaioi/AUTO-SCHEDULE-PROGRAM/pull/19)
