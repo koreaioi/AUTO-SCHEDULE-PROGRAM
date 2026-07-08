@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('면접관 관리')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav('interviewers')}"></nav>
+
+<div class="container">
+  <h2>면접관 관리</h2>
+
+  <div th:if="${error}" class="alert alert-danger mb-4" style="border-radius: 12px;" th:text="${error}"></div>
+
+  <div class="card mb-4">
+    <div class="card-body p-0">
+      <div class="p-4 d-flex justify-content-between align-items-center border-bottom">
+        <h5 class="card-title mb-0">면접관 목록</h5>
+      </div>
+      <div th:if="${#lists.isEmpty(interviewers)}" class="p-4 text-muted text-center">등록된 면접관이 없습니다.</div>
+      <div class="table-responsive">
+        <table th:unless="${#lists.isEmpty(interviewers)}" class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width: 80px">ID</th>
+              <th>이름</th>
+              <th>파트</th>
+              <th>가용 시간</th>
+              <th class="text-end">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            <th:block th:each="iv : ${interviewers}">
+              <tr>
+                <td th:text="${iv.id}" class="text-muted small"></td>
+                <td><span class="fw-bold" th:text="${iv.name}"></span></td>
+                <td><span class="badge bg-light text-dark border" th:text="${iv.part}"></span></td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1">
+                    <span th:each="t : ${iv.availableTimes}" class="badge bg-light text-muted border small" th:text="${#strings.substring(t, 5, 16).replace('T', ' ')}"></span>
+                  </div>
+                </td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary me-1"
+                          th:onclick="|document.getElementById('edit-' + ${iv.id}).classList.toggle('d-none')|">
+                    수정
+                  </button>
+                  <form method="post" th:action="@{/interviewers/{id}/delete(id=${iv.id})}"
+                        style="display:inline"
+                        onsubmit="return confirm('삭제하시겠습니까?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:id="|edit-${iv.id}|" class="d-none bg-light">
+                <td colspan="5" class="p-4">
+                  <form method="post" th:action="@{/interviewers/{id}/update(id=${iv.id})}">
+                    <div class="row g-3 align-items-end">
+                      <div class="col-md-2">
+                        <label class="form-label small fw-bold">이름</label>
+                        <input type="text" name="name" th:value="${iv.name}" class="form-control" required>
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label small fw-bold">파트</label>
+                        <input type="text" name="part" th:value="${iv.part}" class="form-control">
+                      </div>
+                      <div class="col-md-5">
+                        <label class="form-label small fw-bold">가용 시간 (쉼표 구분)</label>
+                        <input type="text" name="availableTimesRaw" class="form-control"
+                               th:value="${#strings.listJoin(iv.availableTimes, ', ')}">
+                      </div>
+                      <div class="col-md-3 text-end">
+                        <button type="submit" class="btn btn-primary">저장</button>
+                        <button type="button" class="btn btn-light"
+                                th:onclick="|document.getElementById('edit-' + ${iv.id}).classList.add('d-none')|">취소</button>
+                      </div>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">면접관 등록</h5>
+      <form method="post" th:action="@{/interviewers}">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label small fw-bold">이름</label>
+            <input type="text" name="name" class="form-control" placeholder="이름을 입력하세요" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-bold">파트</label>
+            <input type="text" name="part" class="form-control" placeholder="예: 딥러닝, 웹, 기획">
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-bold">가용 시간 (쉼표 구분)</label>
+            <textarea name="availableTimesRaw" class="form-control" rows="2"
+                      placeholder="예: 2024-03-01T10:00, 2024-03-02T14:00"></textarea>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary px-4">등록하기</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
