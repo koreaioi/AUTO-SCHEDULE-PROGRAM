@@ -36,7 +36,7 @@ public class ExcelExportService {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
             if (rows.hasNext()) rows.next(); // 헤더 스킵
-
+            int count = 0;
             while (rows.hasNext()) {
                 Row row = rows.next();
                 String name = getStringCellValue(row.getCell(0));
@@ -45,6 +45,11 @@ public class ExcelExportService {
                 String part = getStringCellValue(row.getCell(3));
                 String univ = getStringCellValue(row.getCell(4));
 
+                if (isRowEmpty(name, sex, email, part, univ)) continue;
+                count++;
+
+                log.info("name {}", name);
+                log.info("sex {}", sex);
                 log.info("part {}", part);
 
                 List<LocalDateTime> availableTimes = new ArrayList<>();
@@ -71,6 +76,7 @@ public class ExcelExportService {
 
                 applicants.add(Applicant.of(name, sex, email, part, univ, availableTimes));
             }
+            log.info("인식되는 행 개수 {}", count);
         } catch (IOException e) {
             throw new UncheckedIOException("[Excel]파일을 읽을 수 없습니다.", e);
         }
@@ -80,5 +86,12 @@ public class ExcelExportService {
 
     private String getStringCellValue(Cell cell) {
         return cell == null ? "" : cell.getCellType() == CellType.STRING ? cell.getStringCellValue() : cell.toString();
+    }
+
+    private boolean isRowEmpty(String... values) {
+        for (String value : values) {
+            if (!value.isBlank()) return false;
+        }
+        return true;
     }
 }
